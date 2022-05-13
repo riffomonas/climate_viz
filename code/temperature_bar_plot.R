@@ -1,4 +1,5 @@
 library(tidyverse)
+library(scales)
 library(glue)
 
 t_data <- read_csv("data/GLB.Ts+dSST.csv", skip = 1, na = "***") %>%
