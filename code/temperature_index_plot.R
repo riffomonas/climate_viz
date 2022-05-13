@@ -3,6 +3,7 @@ library(tidyverse)
 
 read_csv("data/GLB.Ts+dSST.csv", skip=1, na = "***") %>%
   select(year = Year, t_diff = `J-D`) %>%
+  drop_na() %>%
   ggplot(aes(x=year, y=t_diff)) +
   geom_line(aes(color = "1"), size=0.5, show.legend = FALSE) + 
   geom_point(fill="white", aes(color = "1"), shape=21, show.legend=TRUE) +
