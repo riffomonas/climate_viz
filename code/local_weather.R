@@ -37,50 +37,12 @@ local_weather <- read_csv(station_daily,
          col_names = c("station", "date", "variable", "value",
                        "a", "b", "c", "d")) %>%
   select(date, variable, value) %>%
-  pivot_wider(names_from = "variable", values_from="value",
-              values_fill = 0) %>%
+  pivot_wider(names_from = "variable", values_from="value") %>%
   select(date, TMAX, PRCP, SNOW) %>%
   mutate(date = ymd(date),
          TMAX = TMAX / 10,
          PRCP = PRCP / 10) %>%
   rename_all(tolower) %>%
-  # filter(prcp < 200) %>%
   mutate(snow = if_else(snow < 500, snow, NA_real_),
-         prcp = if_else(prcp < 200, prcp, NA_real_),
-         date = na_if(date, "1891-10-09"),
-         date = if_else(date == "1891-10-05", as.Date(NA_character_), date)) %>%
-  drop_na(prcp)
-
-
-local_weather %>%
-  ggplot(aes(x=date, y=tmax)) +
-  geom_line()
-
-local_weather %>%
-  ggplot(aes(x = tmax)) +
-  geom_histogram(binwidth = 2.5)
-
-local_weather %>%
-  ggplot(aes(x=date, y=prcp)) +
-  geom_line()
-
-local_weather %>%
-  slice_max(n=5, prcp)
-
-local_weather %>%
-  ggplot(aes(x = prcp)) +
-  geom_histogram() +
-  scale_y_continuous(limits = c(0, 50))
-
-
-local_weather %>%
-  ggplot(aes(x=date, y=snow)) +
-  geom_line()
-
-local_weather %>%
-  slice_max(n=5, snow)
-
-local_weather %>%
-  ggplot(aes(x = snow)) +
-  geom_histogram() +
-  scale_y_continuous(limits = c(0, 50))
+         prcp = if_else(prcp < 200, prcp, NA_real_)
+  )
