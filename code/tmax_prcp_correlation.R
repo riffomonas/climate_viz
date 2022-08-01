@@ -34,19 +34,22 @@ tmax_plot <- scaled_tmax_prcp %>%
 
 tmax_plot +
   geom_line(aes(y = prcp_tr), color = "red") +
-  scale_y_continuous(labels = seq(10, 30, 5),
-                     breaks = (seq(10, 30, 5) - 11.7)/17.5,
-                     limits = (c(8, 32) - 11.7)/17.5,
-                     name = "Average annual temperature",
+  scale_y_continuous(labels = seq(11, 18, 2),
+                     breaks = (seq(11, 18.5, 2) - 11.7)/(17.5-11.7),
+                     limits = (c(11, 18) - 11.7)/(17.5-11.7),
+                     name = "Average annual temperature (\u00B0C)",
                      sec.axis = sec_axis(trans = ~.,
-                                         labels = seq(300, 1800, 300),
-                                         breaks = (seq(300, 1800, 300) - 420)/1298,
+                                         labels = seq(400, 1400, 250),
+                                         breaks = (seq(400, 1400, 250) - 420)/(1298-420),
                                          name = "Total Precipitation (mm)"
                                          )
                      ) +
+  theme_classic() +
   theme(axis.title.y.left = element_text(color = "blue"),
-        axis.title.y.right = element_text(color = "red"))
-
+        axis.title.y.right = element_text(color = "red")) +
+  labs(x = "Year")
+  
+ggsave("figures/tmax_prcp_doubley.png", width = 6, height=4.5)
 
 
 tmax_prcp %>%
