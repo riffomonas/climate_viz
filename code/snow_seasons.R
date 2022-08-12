@@ -7,29 +7,30 @@ snow_data <- local_weather %>%
   drop_na(snow) %>%
   mutate(cal_year = year(date),
          month = month(date),
-         snow_year = if_else(date < ymd(glue("{cal_year}-07-01")),
+         snow_year = if_else(date < ymd(glue("{cal_year}-08-01")),
                              cal_year - 1,
                              cal_year)) %>%
   select(month, snow_year, snow) %>%
-  filter(snow_year != 1891 & snow_year != 2022)
+  filter(snow_year != 1891 & snow_year != 2022) %>%
+  mutate(snow_year = factor(snow_year, levels = 1892:2021),
+         month = factor(month, levels = c(8:12, 1:7)))
+  
 
 
 snow_data %>%
-  group_by(snow_year) %>%
+  group_by(snow_year, .drop = FALSE) %>%
   summarize(total_snow = sum(snow)) %>%
+  mutate(snow_year = as.numeric(levels(snow_year))) %>%
   ggplot(aes(x = snow_year, y = total_snow)) +
   geom_line()
 
 snow_data %>%
   filter(snow > 0) %>%
-  count(snow_year) %>%
+  count(snow_year, .drop= FALSE) %>%
+  mutate(snow_year = as.numeric(levels(snow_year))) %>%
   ggplot(aes(x = snow_year, y = n)) +
   geom_line()
 
-
-dummy_df <- crossing(snow_year = 1892:2021,
-                     month = 1:12) %>%
-  mutate(dummy = 0)
 
 total_snow <- snow_data %>%
   group_by(snow_year) %>%
@@ -40,12 +41,9 @@ total_snow <- snow_data %>%
 
 
 snow_data %>%
-  right_join(., dummy_df, by = c("snow_year", "month")) %>%
-  mutate(snow  = if_else(is.na(snow), dummy, snow )) %>%
-  group_by(snow_year, month) %>%
+  group_by(snow_year, month, .drop = FALSE) %>%
   summarize(snow = sum(snow), .groups = "drop") %>%
-  mutate(month = factor(month, levels = c(8:12, 1:7)),
-         is_this_year = 2021 == snow_year) %>%
+  mutate(is_this_year = 2021 == snow_year) %>%
   ggplot(aes(x = month, y = snow, group = snow_year, color = is_this_year)) +
   geom_line(show.legend = FALSE) +
   scale_color_manual(name = NULL,
